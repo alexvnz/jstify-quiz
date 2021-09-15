@@ -1,4 +1,4 @@
-const { convertFnToArrowFn, convertArrowFnToFn } = require('./convertFn');
+const { convertFn } = require('./convertFn');
 
 const fn = [
 /* #0 */ `function jstify(str) { console.log(str); }`,
@@ -73,14 +73,14 @@ const arrowFnRes = [
 
 for (let i = 0; i < 5; i++) {
   test(`Convert function to arrow function: fn ${i}`, (done) => {
-    expect(convertFnToArrowFn(fn[i])).toStrictEqual(fnRes[i]);
+    expect(convertFn(fn[i])).toStrictEqual(fnRes[i]);
     done();
   })
 }
 
 for (let i = 0; i < 5; i++) {
   test(`Convert arrow function to function: arrow fn ${i}`, (done) => {
-    expect(convertArrowFnToFn(arrowFn[i])).toStrictEqual(arrowFnRes[i]);
+    expect(convertFn(arrowFn[i])).toStrictEqual(arrowFnRes[i]);
     done();
   })
 }

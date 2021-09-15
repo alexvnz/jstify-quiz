@@ -1,9 +1,26 @@
+const getNameAndArgs = (fnToArrowFn, match) => {
+  if (fnToArrowFn) {
+    const args = match.split(/function|\(|\)/);
+    return { functionName: args[1].trim(), functionArgs: args[2].trim() };
+  }
+
+  const args = match.split(/const|var|let|=|\(|\)/);
+  const functionName = args.length === 6 ? args[1].trim() : null;
+  const functionArgs = args.length === 6 ? args[3].trim() : args[1].trim();
+  return { functionName, functionArgs };
+}
+
 module.exports = {
-  convertFnToArrowFn: (str) => {
-    const regexp = /function(.*\(.*\)\s*){/g;
+  convertFn: (str) => {
+    const regexp1 = /function(.*\(.*\)\s*){/g;
+    const regexp2 = /((const|var|let)\s.*=\s*)?\(.*\)\s*=>\s*{/g;
+    let matches = Array.from(str.matchAll(regexp1));
+    let fnToArrowFn = true;
+    if (!matches.length) {
+      matches = Array.from(str.matchAll(regexp2));
+      fnToArrowFn = false;
+    }
 
-    let matches = str.matchAll(regexp);
-    matches = Array.from(matches);
     if (!matches.length) {
       return str;
     }
@@ -12,11 +29,10 @@ module.exports = {
     let index = matches[0].index;
     for (const match of matches) {
       newStr += str.substring(index, match.index);
-      const args = match[0].split(/function|\(|\)/);
-      const functionName = args[1].trim();
-      const functionArgs = args[2].trim();
+      const { functionName, functionArgs } = getNameAndArgs(fnToArrowFn, match[0])
+      newStr += fnToArrowFn ? '' : 'function ';
       if (functionName) {
-        newStr += `const ${functionName} = `;
+        newStr += fnToArrowFn ? `const ${functionName} = ` : `${functionName}`;
       }
 
       newStr += '(';
@@ -24,40 +40,7 @@ module.exports = {
         newStr += functionArgs;
       }
 
-      newStr += ') => {';
-      index = match.index + match[0].length;
-    }
-    newStr += str.substring(index);
-    return newStr;
-  },
-
-  convertArrowFnToFn: (str) => {
-    const regexp = /((const|var|let)\s.*=\s*)?\(.*\)\s*=>\s*{/g;
-
-    let matches = str.matchAll(regexp);
-    matches = Array.from(matches);
-    if (!matches.length) {
-      return str;
-    }
-
-    let newStr = '';
-    let index = matches[0].index;
-    for (const match of matches) {
-      newStr += str.substring(index, match.index);
-      const args = match[0].split(/const|var|let|=|\(|\)/);
-      const functionName = args.length === 6 ? args[1].trim() : null;
-      const functionArgs = args.length === 6 ? args[3].trim() : args[1].trim();
-      newStr += 'function ';
-      if (functionName) {
-        newStr += `${functionName}`;
-      }
-
-      newStr += '(';
-      if (functionArgs) {
-        newStr += functionArgs;
-      }
-
-      newStr += ') {';
+      newStr += fnToArrowFn ? ') => {' : ') {';
       index = match.index + match[0].length;
     }
     newStr += str.substring(index);
