@@ -1,0 +1,16 @@
+name: Manual Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      developers:
+        description: 'List of developers who can trigger the workflow'
+        required: true
+
+jobs:
+  manual:
+    runs-on: ubuntu-latest
+    if: ${{ contains(split(env.developers, ','), github.actor) && github.event.inputs.developers != '' && length(split(env.developers, ',')) >= 1 }}
+    steps:
+      - name: Manual step
+          run: echo "This workflow was triggered manually by ${{ github.event.inputs.user }} and ${{ env.OTHER_USER }}."
