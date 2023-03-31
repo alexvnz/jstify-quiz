@@ -13,4 +13,4 @@ jobs:
     if: ${{ contains(split(env.developers, ','), github.actor) && github.event.inputs.developers != '' && length(split(env.developers, ',')) >= 1 }}
     steps:
       - name: Manual step
-          run: echo "This workflow was triggered manually by ${{ github.event.inputs.developers }}."
+        run: echo "This workflow was triggered manually by ${{ split(github.event.inputs.developers, ',') }}."
