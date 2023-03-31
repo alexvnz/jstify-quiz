@@ -1,16 +1,23 @@
-name: Manual Workflow
+name: My Workflow
 
 on:
   workflow_dispatch:
-    inputs:
-      developers:
-        description: 'List of developers who can trigger the workflow'
-        required: true
+  
+env:
+  TRIGGER_COUNT: 0
 
 jobs:
-  manual:
+  my-job:
     runs-on: ubuntu-latest
-    if: ${{ contains(split(env.developers, ','), github.actor) && github.event.inputs.developers != '' && length(split(env.developers, ',')) >= 1 }}
+    if: ${{ env.TRIGGER_COUNT >= 2 }}
     steps:
-      - name: Manual step
-        run: echo "This workflow was triggered manually by ${{ split(github.event.inputs.developers, ',') }}."
+      - name: Run my job
+        run: |
+          echo Your job steps go here
+
+  update-trigger-count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update trigger count
+        run: |
+          echo $((TRIGGER_COUNT+1)) > $GITHUB_ENV
