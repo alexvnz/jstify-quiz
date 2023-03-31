@@ -7,17 +7,17 @@ env:
   TRIGGER_COUNT: 0
 
 jobs:
-  update-trigger-count:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update trigger count
-        run: |
-          echo $((TRIGGER_COUNT+1)) > $GITHUB_ENV
-
   my-job:
     runs-on: ubuntu-latest
     if: ${{ env.TRIGGER_COUNT >= 2 }}
     steps:
       - name: Run my job
         run: |
-          echo Your job steps go here
+          # Your job steps go here
+
+  update-trigger-count:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update trigger count
+        run: |
+          echo $((TRIGGER_COUNT+1)) > $GITHUB_ENV
