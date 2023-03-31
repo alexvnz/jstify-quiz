@@ -9,8 +9,30 @@ env:
 jobs:
   my-job:
     runs-on: ubuntu-latest
-    if: ${{ env.TRIGGER_COUNT >= 2 }}
+    if: steps.check_trigger_count.outputs.trigger_count >= 2 && steps.check_collaborators.outputs.collaborators_unique == 'true'
     steps:
+      - name: Check trigger count
+        id: check_trigger_count
+        run: |
+          echo "::set-output name=trigger_count::${{ env.TRIGGER_COUNT }}"
+
+      - name: Check collaborators
+        id: check_collaborators
+        run: |
+          if [ "${{ env.TRIGGER_COUNT }}" -eq "0" ]; then
+            echo "::set-output name=collaborators_unique::true"
+          else
+            collaborator_list=$(echo "${{ github.event.client_payload.sender.login }}" | tr ',' '\n' | sort | uniq)
+            num_collaborators=$(echo "${collaborator_list}" | wc -l)
+            num_unique_collaborators=$(echo "${collaborator_list}" | sort | uniq | wc -l)
+
+            if [ "${num_collaborators}" -eq "${num_unique_collaborators}" ]; then
+              echo "::set-output name=collaborators_unique::true"
+            else
+              echo "::set-output name=collaborators_unique::false"
+            fi
+          fi
+
       - name: Run my job
         run: |
           # Your job steps go here
