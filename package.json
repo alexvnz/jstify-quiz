@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "JStify Quiz",
   "main": "convertFn.js",
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "jest": "^27.2.0"
   },
